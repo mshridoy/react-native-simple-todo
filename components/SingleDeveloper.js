@@ -7,9 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-import moment from "moment";
-
-const Task = (props) => {
+const Developer = (props) => {
   return (
     <View style={styles.item}>
       <View style={styles.square}></View>
@@ -22,14 +20,11 @@ const Task = (props) => {
                 : styles.itemText
             }
           >
-            {props.text}
+            {props.name}
           </Text>
         </View>
-        <Text style={{ color: "gray" }}>
-          {moment(new Date(props.time)).subtract(0, "days").calendar()}
-        </Text>
+        <Text style={{ color: "gray" }}>Department of {props.department}</Text>
       </View>
-      <View style={styles.circular}></View>
     </View>
   );
 };
@@ -41,7 +36,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 1,
   },
   itemLeft: {
     flexDirection: "row",
@@ -51,7 +46,7 @@ const styles = StyleSheet.create({
   square: {
     width: 24,
     height: 24,
-    backgroundColor: "#55BCF6",
+    backgroundColor: "#90ee90",
     opacity: 0.4,
     borderRadius: 5,
     marginRight: 20,
@@ -69,4 +64,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Task;
+export default Developer;

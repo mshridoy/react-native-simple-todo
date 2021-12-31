@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "react-native-todo-list",
-    "slug": "react-native-todo-list",
+    "name": "TODO Task Manager",
+    "slug": "todo-task-manager",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,9 +13,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -23,7 +21,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.rauftaskmanager.com"
     },
     "web": {
       "favicon": "./assets/favicon.png"

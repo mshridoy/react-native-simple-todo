@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   KeyboardAvoidingView,
   StyleSheet,
@@ -40,6 +40,7 @@ const getData = async () => {
 export default function App({ navigation }) {
   const mainContext = useContext(MainContext);
   const { taskItems, setTaskItems } = mainContext;
+
   const [task, setTask] = useState();
   // const [taskItems, setTaskItems] = useState([]);
 
@@ -47,6 +48,7 @@ export default function App({ navigation }) {
     navigation.addListener("tabPress", (e) => {
       (async function () {
         const data = await getData();
+
         if (data) {
           const storedDataFetched = JSON.parse(data);
           setTaskItems(storedDataFetched);
@@ -55,49 +57,41 @@ export default function App({ navigation }) {
     });
   }, [navigation]);
 
-  const handleAddTask = useCallback(() => {
-    (async function () {
-      const newTask = {
-        id: Date.now(),
-        time: Date.now(),
-        task,
-        isCompleted: false,
-      };
-      Keyboard.dismiss();
-      setTaskItems([newTask, ...taskItems]);
-      await storeData([newTask, ...taskItems]);
-      setTask(null);
-      ToastAndroid.showWithGravity(
-        "New Task Added!",
-        ToastAndroid.SHORT,
-        ToastAndroid.BOTTOM
-      );
-    })();
-  }, [task, ToastAndroid]);
+  const handleAddTask = () => {
+    const newTask = {
+      id: Date.now(),
+      time: Date.now(),
+      task,
+      isCompleted: false,
+    };
+    Keyboard.dismiss();
+    setTaskItems([newTask, ...taskItems]);
+    storeData([newTask, ...taskItems]);
+    setTask(null);
+    ToastAndroid.showWithGravity(
+      "New Task Added!",
+      ToastAndroid.SHORT,
+      ToastAndroid.BOTTOM
+    );
+  };
 
-  const completeTask = useCallback(
-    (id) => {
-      (async function () {
-        const updatedData = taskItems.map((singleItem) => {
-          if (singleItem.id.toString() === id.toString()) {
-            const cloneItem = { ...singleItem };
-            cloneItem.isCompleted = true;
-            return cloneItem;
-          }
-          return singleItem;
-        });
-        setTaskItems(updatedData);
-        storeData(updatedData);
-        ToastAndroid.showWithGravity(
-          "Task completed!",
-          ToastAndroid.SHORT,
-          ToastAndroid.BOTTOM
-        );
-      })();
-    },
-    [taskItems, setTaskItems, storeData, ToastAndroid]
-  );
-
+  const completeTask = (id) => {
+    const updatedData = taskItems.map((singleItem) => {
+      if (singleItem.id === id) {
+        const cloneItem = { ...singleItem };
+        cloneItem.isCompleted = false;
+        return cloneItem;
+      }
+      return singleItem;
+    });
+    setTaskItems(updatedData);
+    storeData(updatedData);
+    ToastAndroid.showWithGravity(
+      "Task move to active!",
+      ToastAndroid.SHORT,
+      ToastAndroid.BOTTOM
+    );
+  };
   const deleteTask = (id) => {
     Vibration.vibrate(100);
     Alert.alert(
@@ -145,22 +139,9 @@ export default function App({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.writeTaskWrapper}>
-        <TextInput
-          style={styles.input}
-          placeholder={"Write a task"}
-          value={task}
-          onChangeText={(text) => setTask(text)}
-        />
-        <TouchableOpacity onPress={() => handleAddTask()}>
-          <View style={styles.addWrapper}>
-            <Text style={styles.addText}>+</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
       {/* Added this scroll view to enable scrolling when list gets longer than the page */}
 
-      {taskItems.filter((singleItem) => singleItem.isCompleted === false)
+      {taskItems.filter((singleItem) => singleItem.isCompleted === true)
         .length === 0 ? (
         <View
           style={{
@@ -174,8 +155,9 @@ export default function App({ navigation }) {
             style={{ width: 150, height: 150 }}
             source={require("../images/nodata.png")}
           />
-          <Text style={{ marginTop: 5 }}>You don't have any task.</Text>
-          <Text>Please add new task from the top.</Text>
+          <Text style={{ marginTop: 8 }}>
+            You don't have any completed task.
+          </Text>
         </View>
       ) : (
         <ScrollView
@@ -189,7 +171,7 @@ export default function App({ navigation }) {
             <View style={styles.items}>
               {/* This is where the tasks will go! */}
               {taskItems
-                .filter((singleItem) => singleItem.isCompleted === false)
+                .filter((singleItem) => singleItem.isCompleted === true)
                 .map((item) => {
                   return (
                     <TouchableOpacity
@@ -197,7 +179,11 @@ export default function App({ navigation }) {
                       onPress={() => completeTask(item.id)}
                       onLongPress={() => deleteTask(item.id)}
                     >
-                      <Task text={item.task} time={item.time} />
+                      <Task
+                        text={item.task}
+                        time={item.time}
+                        isCompleted={item.isCompleted}
+                      />
                     </TouchableOpacity>
                   );
                 })}
@@ -215,7 +201,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#E8EAED",
   },
   tasksWrapper: {
-    paddingTop: 20,
     paddingHorizontal: 20,
   },
   sectionTitle: {
